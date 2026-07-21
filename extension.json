@@ -1,0 +1,14 @@
+{
+    "name": "SMSPhoneVerification",
+    "version": "1.0.0",
+    "author": "Anagrams in Nuts",
+    "description": "It asks the user to enter a phone number, and sends a 6-digit code with a prefix via SMS.",
+    "type": "extension",
+    "LicenseName": "GPL-3.0",
+    "AutoloadNamespaces": {
+        "MediaWiki\\Extension\\MyExtension\\": "includes/"
+    },
+    "Hooks": {
+        "BeforePageDisplay": "MediaWiki\\Extension\\SMSPhoneVerification\\Hooks::onBeforePageDisplay"
+    }
+}
