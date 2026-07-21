@@ -15,7 +15,7 @@ SMSPhoneVerification is a MediaWiki extension that adds SMS-based phone number v
 ## Requirements
 
 - MediaWiki 1.43 or later
-- PHP 8.4.23 or later
+- PHP 8.2 or later
 - A supported SMS gateway/provider
 
 ## Installation
