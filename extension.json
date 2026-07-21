@@ -10,5 +10,18 @@
     },
     "Hooks": {
         "BeforePageDisplay": "MediaWiki\\Extension\\SMSPhoneVerification\\Hooks::onBeforePageDisplay"
+"SpecialPages": {
+		"SMSPhoneVerification": "MediaWiki\\Extension\\SMSPhoneVerification\\SpecialSMSPhoneVerify"
+	},
+	"MessagesDirs": {
+		"SMSPhoneVerification": [
+			"i18n"
+		]
+	},
+	"manifest_version": 2,
+	"requires": {
+		"MediaWiki": ">= 1.43.0",
+		"platform": {
+			"php": ">= 8.2"    
     }
 }
