@@ -87,7 +87,7 @@ class SpecialSMSPhoneVerify extends SpecialPage {
         // Default prefix if not set
         $prefix = isset( $wgSMSPhoneVerificationPrefix ) && $wgSMSPhoneVerificationPrefix !== ''
             ? $wgSMSPhoneVerificationPrefix
-            : 'MW-';
+            : 'SMS-';
 
         // Generate prefixed code
         $numericCode = random_int( 100000, 999999 );
