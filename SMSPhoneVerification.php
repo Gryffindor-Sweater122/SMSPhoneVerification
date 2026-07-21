@@ -2,11 +2,9 @@
 /**
  * SMSPhoneVerification MediaWiki Extension
  * 
- * This extension adds a user preference for phone number
- * and sends a verification code via SMS.
- * 
- * SECURITY: Do not store raw verification codes in plain text.
- * Use hashing and secure storage.
+ * Adds a user preference for phone number and sends a verification code via SMS.
+ * Now supports a customizable 3-letter prefix before the code.
+ * Do NOT show codes in plain text; use hash databases.
  */
 
 use MediaWiki\MediaWikiServices;
@@ -31,21 +29,32 @@ class SMSPhoneVerification {
      * Replace with your SMS provider API logic
      */
     public static function sendVerificationCode( $phoneNumber ) {
+        global $wgSMSVerificationPrefix;
+
+        // Validate phone number format (E.164 recommended)
         if (empty($phoneNumber) || !preg_match('/^\+?[1-9]\d{7,14}$/', $phoneNumber)) {
             throw new InvalidArgumentException("Invalid phone number format.");
         }
 
-        // Generate a secure random 6-digit code
-        $code = random_int(100000, 999999);
+        // Ensure prefix is set and valid (default: "SMS")
+        $prefix = isset($wgSMSVerificationPrefix) && preg_match('/^[A-Z]{3}$/i', $wgSMSVerificationPrefix)
+            ? strtoupper($wgSMSVerificationPrefix)
+            : 'SMS';
 
-        // Store hashed code in session (or DB)
+        // Generate a secure random 6-digit code
+        $numericCode = random_int(100000, 999999);
+
+        // Combine prefix and numeric code
+        $fullCode = $prefix . $numericCode;
+
+        // Store hashed numeric code in session (prefix not stored for security)
         $session = MediaWikiServices::getInstance()->getSessionManager()->getSessionForRequest();
-        $session->set('sms_verification_code', password_hash((string)$code, PASSWORD_DEFAULT));
+        $session->set('sms_verification_code', password_hash((string)$numericCode, PASSWORD_DEFAULT));
 
         // Example: Replace with actual SMS API call
-        // self::sendViaTwilio($phoneNumber, "Your verification code is: $code");
+        // self::sendViaTwilio($phoneNumber, "Your verification code is: $fullCode");
 
-        wfDebugLog('SMSPhoneVerification', "Verification code $code sent to $phoneNumber");
+        wfDebugLog('SMSPhoneVerification', "Verification code $fullCode sent to $phoneNumber");
 
         return true;
     }
@@ -54,6 +63,18 @@ class SMSPhoneVerification {
      * Verify the code entered by the user
      */
     public static function verifyCode( $inputCode ) {
+        global $wgSMSVerificationPrefix;
+
+        // Ensure prefix is set and valid (default: "SMS")
+        $prefix = isset($wgSMSVerificationPrefix) && preg_match('/^[A-Z]{3}$/i', $wgSMSVerificationPrefix)
+            ? strtoupper($wgSMSVerificationPrefix)
+            : 'SMS';
+
+        // Remove prefix before verification
+        if (stripos($inputCode, $prefix) === 0) {
+            $inputCode = substr($inputCode, strlen($prefix));
+        }
+
         $session = MediaWikiServices::getInstance()->getSessionManager()->getSessionForRequest();
         $storedHash = $session->get('sms_verification_code');
 
@@ -68,7 +89,7 @@ class SMSPhoneVerification {
      * Example SMS sending function (Twilio)
      */
     private static function sendViaTwilio( $to, $message ) {
-        // This is a placeholder — integrate Twilio SDK here
+        // Placeholder — integrate Twilio SDK here
         // Example:
         // $client = new Twilio\Rest\Client($sid, $token);
         // $client->messages->create($to, ['from' => $fromNumber, 'body' => $message]);
