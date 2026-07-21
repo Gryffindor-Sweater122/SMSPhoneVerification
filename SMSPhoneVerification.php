@@ -68,7 +68,7 @@ class SMSPhoneVerification {
         // Ensure prefix is set and valid (default: "SMS")
         $prefix = isset($wgSMSVerificationPrefix) && preg_match('/^[A-Z]{3}$/i', $wgSMSVerificationPrefix)
             ? strtoupper($wgSMSVerificationPrefix)
-            : 'SMS';
+            : 'SMS-';
 
         // Remove prefix before verification
         if (stripos($inputCode, $prefix) === 0) {
